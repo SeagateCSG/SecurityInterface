@@ -57,3 +57,4 @@ Usage
 	* `- (IBAction)toggleTextShown:(id)sender;`
 
 I generally prefer to hook up a checkbox (`NSButton`) straight to the `toggleTextShown:` action
+
