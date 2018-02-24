@@ -199,8 +199,41 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
 - (void) controlDidBecomeFirstResponder:(NSNotification *)aNotification;
 @end
 
+@interface NSSecureTextView : NSTextView
+
+@end
+
+@interface KSPasswordEditorView : NSSecureTextView
+
+@property (nonatomic) BOOL allowsPaste;
+
+@end
+
+@implementation KSPasswordEditorView
+
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard type:(NSString *)type {
+    if (!_allowsPaste)
+        return NO;
+    return [super readSelectionFromPasteboard:pboard type:type];
+}
+
+@end
 
 @implementation KSPasswordTextFieldCell
+
+- (NSTextView *)fieldEditorForView:(NSView *)controlView {
+    BOOL allowsPaste = NO;
+    
+    if ([controlView isKindOfClass:[KSPasswordField class]])
+        allowsPaste = ((KSPasswordField *)controlView).allowsPaste;
+    
+    KSPasswordEditorView *view = [[KSPasswordEditorView alloc] init];
+    
+    view.fieldEditor = YES;
+    view.allowsPaste = allowsPaste;
+    
+    return view;
+}
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
@@ -224,7 +257,9 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
     {
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
-
+    
+    result.origin.y += 1;
+    
     return result;
 }
 
@@ -254,6 +289,20 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
 
 @implementation KSPasswordSecureTextFieldCell
 
+- (NSTextView *)fieldEditorForView:(NSView *)controlView {
+    BOOL allowsPaste = NO;
+    
+    if ([controlView isKindOfClass:[KSPasswordField class]])
+        allowsPaste = ((KSPasswordField *)controlView).allowsPaste;
+
+    KSPasswordEditorView *view = [[KSPasswordEditorView alloc] init];
+    
+    view.fieldEditor = YES;
+    view.allowsPaste = allowsPaste;
+    
+    return view;
+}
+
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
     cellFrame = drawAdornments(cellFrame, controlView);
@@ -275,6 +324,8 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
     {
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
+
+    result.origin.y += 1;
 
     return result;
 }
@@ -327,7 +378,8 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
         _becomesFirstResponderWhenToggled = YES;
 
 		// Don't show text by default. This needs to be called to replace the standard cell with our custom one.
-		[self setShowsText:NO];
+        [self setShowsText:NO];
+        [self setAllowsPaste:YES];
     }
     return self;
 }
@@ -340,6 +392,7 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
 
 		// Don't show text by default. This needs to be called to replace the standard cell with our custom one.
 		[self setShowsText:NO];
+        [self setAllowsPaste:YES];
     }
     return self;
 }

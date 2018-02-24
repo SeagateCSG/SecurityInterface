@@ -63,6 +63,8 @@ typedef NS_ENUM(NSInteger, PasswordMeter) {
  */
 @property(nonatomic) BOOL showsText;
 
+@property (nonatomic) BOOL allowsPaste;
+
 @property (nonatomic, assign) float strength;
 @property (nonatomic, assign) NSUInteger length;
 @property (nonatomic, assign) MATCHING matching;
