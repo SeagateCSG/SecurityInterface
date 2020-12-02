@@ -258,8 +258,9 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
     
-    result.origin.y += 1;
-    
+    CGFloat minHeight = self.cellSize.height;
+    result.origin.y += (result.size.height - minHeight)/2;
+    result.origin.x += 8;
     return result;
 }
 
@@ -325,8 +326,9 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
 
-    result.origin.y += 1;
-
+    CGFloat minHeight = self.cellSize.height;
+    result.origin.y += (result.size.height - minHeight)/2;
+    result.origin.x += 8;
     return result;
 }
 
