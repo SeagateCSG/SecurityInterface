@@ -27,6 +27,7 @@
 #import "KSPasswordField.h"
 
 #define YOFFSET 2
+#define XOFFSET 8
 #define STRENGTH_INSET 4
 
 
@@ -224,7 +225,9 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
     {
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
-
+    CGFloat minHeight = self.cellSize.height;
+    result.origin.x += XOFFSET;
+    result.origin.y += (result.size.height - minHeight)/2;
     return result;
 }
 
@@ -275,7 +278,9 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
     {
         result.size.width -= (16 + 2);	// leave room for drawing indicator
     }
-
+    CGFloat minHeight = self.cellSize.height;
+    result.origin.x += XOFFSET;
+    result.origin.y += (result.size.height - minHeight)/2;
     return result;
 }
 
