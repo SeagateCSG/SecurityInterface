@@ -25,7 +25,6 @@
 //
 
 #import "KSPasswordField.h"
-#import "NSData+Karelia.h"
 
 #define YOFFSET 2
 #define STRENGTH_INSET 4
@@ -82,7 +81,6 @@ void drawMeter(NSRect bounds, float strength, NSUInteger width)
     CGFloat cappedWidth = MIN(rectToUse.size.width, width);
     rectToUse.size.width = cappedWidth;
     [gradient drawInRect:rectToUse angle:0.0];  // not enough room for rounded rect
-    [gradient release];
 
     [NSGraphicsContext restoreGraphicsState];
 }
@@ -96,7 +94,7 @@ void drawDescriptionOfStrength(NSRect cellFrame, float strength, NSString *descr
     NSColor *textColor = strength < 0.4 ? red : (strength > 0.70 ? green : yellow);
     [textColor set];
     
-    NSMutableParagraphStyle* rightStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+    NSMutableParagraphStyle* rightStyle = [[NSMutableParagraphStyle alloc] init];
 	[rightStyle setAlignment:NSRightTextAlignment];
     NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
             [NSFont systemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName,
@@ -131,8 +129,8 @@ void drawMatch(NSRect cellFrame, MATCHING matching)
     if (fillColor)
     {
         NSBezierPath *fillPath = [NSBezierPath bezierPathWithOvalInRect:drawFrame];
-        NSGradient *fillGradient = [[[NSGradient alloc] initWithStartingColor:[fillColor highlightWithLevel:0.15]
-                                                                  endingColor:[fillColor shadowWithLevel:0.15]] autorelease];
+        NSGradient *fillGradient = [[NSGradient alloc] initWithStartingColor:[fillColor highlightWithLevel:0.15]
+                                                                  endingColor:[fillColor shadowWithLevel:0.15]];
         [fillGradient drawInBezierPath:fillPath angle:90.0];
 
         NSBezierPath *strokePath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(drawFrame, -0.5, -0.5)];
@@ -171,7 +169,7 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
             if (strlength)
             {
                 NSDictionary *attr = [attribStringValue attributesAtIndex:0 effectiveRange:nil];
-                NSAttributedString *oneBullet = [[[NSAttributedString alloc] initWithString:@"•" attributes:attr] autorelease];
+                NSAttributedString *oneBullet = [[NSAttributedString alloc] initWithString:@"•" attributes:attr];
                 r = [oneBullet boundingRectWithSize:[controlView bounds].size options:0];
                 r.size.width *= strlength;
             }
@@ -369,11 +367,11 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
         NSLocalizedString(@"weak", @"description of (strength of) password. SHOULD BE A VERY SHORT WORD!"),
         NSLocalizedString(@"fair", @"description of (strength of) password. OK but not great. SHOULD BE A VERY SHORT WORD!"),
         NSLocalizedString(@"strong", @"description of (strength of) password. SHOULD BE A VERY SHORT WORD!")];
-    sStrengthDescriptions = [strengthDescriptions retain];
+    sStrengthDescriptions = strengthDescriptions;
     
     // Load in the password blacklist file
     NSURL *blacklistURL = [[NSBundle mainBundle] URLForResource:@"blacklist" withExtension:@"plist"];
-    NSArray *blacklistArray = [[[NSArray alloc] initWithContentsOfURL:blacklistURL] autorelease];
+    NSArray *blacklistArray = [[NSArray alloc] initWithContentsOfURL:blacklistURL];
     sPasswordBlacklist = [[NSSet alloc] initWithArray:blacklistArray];
 
     
@@ -382,7 +380,7 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
                           nil];
     for ( NSString *desc in sStrengthDescriptions)
     {
-        NSAttributedString *a = [[[NSMutableAttributedString alloc] initWithString:desc attributes:attr] autorelease];
+        NSAttributedString *a = [[NSMutableAttributedString alloc] initWithString:desc attributes:attr];
         NSRect r = [a boundingRectWithSize:NSZeroSize options:0];
         if (r.size.width > sMaxStrengthDescriptionWidth) sMaxStrengthDescriptionWidth = ceilf(r.size.width);
     }
@@ -452,18 +450,15 @@ NSRect drawAdornments(NSRect cellFrame, NSView *controlView)
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     [[self cell] encodeWithCoder:archiver];
     [archiver finishEncoding];
-    [archiver release];
     
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
     NSTextFieldCell *cell = [[cellClass alloc] initWithCoder:unarchiver];
     cell.stringValue = [self.cell stringValue]; // restore value; secure text fields wisely don't encode it
     [unarchiver finishDecoding];
-    [unarchiver release];
-    [data release];
+
     
     [self setCell:cell];
     [self setNeedsDisplay:YES];
-    [cell release];
 
     // Restore selection
     if (selection)
